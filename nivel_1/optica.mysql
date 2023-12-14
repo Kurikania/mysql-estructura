@@ -8,9 +8,16 @@ CREATE TABLE IF NOT EXISTS provedor
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255),
     telefon VARCHAR(9),
-    fax INT,
+    fax VARCHAR(9),
     NIF VARCHAR(9) UNIQUE,
-    direccion VARCHAR(255)
+    pais VARCHAR(50),
+    codigo_postal VARCHAR(10),
+    ciudad VARCHAR(50),
+    calle VARCHAR(50),
+    numero SMALLINT,
+    piso SMALLINT,
+    porta SMALLINT,
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS gafas
