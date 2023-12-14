@@ -113,3 +113,24 @@ INSERT INTO gafas VALUES (1, 'flotante', 'negro', 50, 'transparente', 'transpare
 INSERT INTO client VALUES (1, 'Добровольский', 'dobro@mail.ru', 'Barcelona', NULL , '2018-03-28' );
 INSERT INTO venta VALUES (1, '2018-03-28', 1, 1, 1);
 INSERT INTO temporada_ventas VALUES (1, '2023-03-28', '2018-12-28');
+
+
+/*
+Per a verificar que el teu disseny és correcte, efectua les següents consultes i comprova que retornen resultats correctes:
+Òptica:
+Llista el total de compres d’un client/a.
+Llista les diferents ulleres que ha venut un empleat durant un any.
+Llista els diferents proveïdors que han subministrat ulleres venudes amb èxit per l'òptica.
+*/
+
+SELECT * FROM venta JOIN client on  client.id = venta.client_id WHERE client.id = 1;
+
+SELECT gafas.* from gafas 
+JOIN venta on venta.gafas_id = gafas.id 
+JOIN empleado on venta.empleado_id 
+WHERE YEAR(venta.create_date) = year(curdate()) and empleado.id = 1;
+
+SELECT DISTINCT provedor.* from provedor 
+JOIN marca on provedor.id = marca.proveerdor_id 
+JOIN gafas on marca.id = gafas.marca_id 
+JOIN venta on venta.gafas_id = gafas.id;

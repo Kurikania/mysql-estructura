@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS product
     descripcion VARCHAR(255),
     imagen VARCHAR(255),
     precio INT,
+    type ENUM('pizza', 'hamburguesa', 'bebida'),
     PRIMARY KEY(id)
 );
 
@@ -71,10 +72,11 @@ CREATE TABLE IF NOT EXISTS tienda
 
 CREATE TABLE IF NOT EXISTS pedido_producto
 (
+    id INT NOT NULL UNIQUE,
     pedido_id INT NOT NULL,
     producto_id INT,
     qty INT,
-    PRIMARY KEY(pedido_id)
+    PRIMARY KEY(id)
 );
 
 # Create FKs
@@ -120,8 +122,29 @@ ALTER TABLE empleado
 INSERT INTO cliente VALUES (1, 'Андрей' ,'Добровольский', NULL , '623108534', 'Barcelona', 'Barcelona' , 'Barcelona', '08026' );
 INSERT INTO product_category VALUES (1, 'большая пицца' );
 INSERT INTO product_category VALUES (2, 'имбирный чай' );
-INSERT INTO product VALUES (1, 1, 'Пицца со всяким разным', 'Пицца со всяким разным', 'https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg',100);
+INSERT INTO product VALUES (1, 1, 'Пицца со всяким разным', 'Пицца со всяким разным', 'https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg',100, 'pizza');
+INSERT INTO product VALUES (2, 2, 'Имбирный чай большой', 'Имбирный чай большой', 'https://images.pexels.com/photos/6962414/pexels-photo-6962414.jpeg',100, 'bebida');
 INSERT INTO tienda VALUES (1, 'Barcelona' ,'Barcelona', 'Barcelona' , '08026');
 INSERT INTO empleado VALUES (1, 'Владимир' ,'Крапивин', NULL , '623108534', 'cocinero', 1 , '9940678Y');
+INSERT INTO empleado VALUES (2, 'Дарья' ,'Краснодымская', NULL , '623103485', 'cocinero', 1 , '6789940Y');
 INSERT INTO pedido VALUES (1, 1, 'reparto', 1, '2023-12-12',100, 1 );
-INSERT INTO pedido_producto VALUES (1, 1 ,10);
+INSERT INTO pedido_producto VALUES (1, 1, 1 ,10);
+INSERT INTO pedido_producto VALUES (2, 1, 2 ,10);
+
+
+/*
+Per a verificar que el teu disseny és correcte, efectua les següents consultes i comprova que retornen resultats correctes:
+Pizzeria:
+*/
+-- Llista quants productes de tipus “Begudes” s'han venut en una determinada localitat.
+SELECT SUM(pedido_producto.qty) FROM pedido 
+JOIN pedido_producto on pedido.id = pedido_producto.pedido_id 
+JOIN product on pedido_producto.producto_id = product.id 
+JOIN tienda on pedido.tienda_id = tienda.id
+where product.type = 'bebida'
+GROUP BY tienda.id; 
+
+-- Llista quantes comandes ha efectuat un determinat empleat/da.
+SELECT COUNT(pedido.empleado_id) as orders_number FROM pedido 
+RIGHT JOIN empleado on pedido.empleado_id = empleado.id 
+GROUP BY empleado.id; 
