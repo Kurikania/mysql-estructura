@@ -1,0 +1,127 @@
+# Create schemas
+
+# Create tables
+CREATE TABLE IF NOT EXISTS cliente
+(
+    id INT NOT NULL UNIQUE,
+    nombre VARCHAR(50) NOT NULL,
+    apellido1 VARCHAR(50) NOT NULL,
+    apellido2 VARCHAR(50),
+    telefono VARCHAR(9),
+    provincia VARCHAR(50),
+    localidad VARCHAR(50),
+    direccion VARCHAR(255),
+    ` codigo_postal` VARCHAR(5),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS product_category
+(
+    id INT NOT NULL,
+    nombre VARCHAR(50) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+
+CREATE TABLE IF NOT EXISTS pedido
+(
+    id INT NOT NULL UNIQUE,
+    empleado_id INT,
+    delivery_type ENUM('reparto','recoger'),
+    tienda_id INT,
+    created_at DATE,
+    precio_total INT,
+    client_id INT,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS product
+(
+    id INT NOT NULL UNIQUE,
+    product_category_id INT,
+    nombre VARCHAR(255),
+    descripcion VARCHAR(255),
+    imagen VARCHAR(255),
+    precio INT,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS empleado
+(
+    id INT NOT NULL UNIQUE,
+    nombre VARCHAR(50) NOT NULL,
+    apellido1 VARCHAR(50) NOT NULL,
+    apellido2 VARCHAR(50),
+    telefono VARCHAR(9),
+    type ENUM('cocinero', 'repartidor'),
+    tienda_id INT,
+    nif VARCHAR(9),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS tienda
+(
+    id INT NOT NULL UNIQUE,
+    provincia VARCHAR(50) NOT NULL,
+    localidad VARCHAR(50),
+    direccion VARCHAR(255),
+    ` codigo_postal` VARCHAR(10) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS pedido_producto
+(
+    pedido_id INT NOT NULL,
+    producto_id INT,
+    qty INT,
+    PRIMARY KEY(pedido_id)
+);
+
+# Create FKs
+ALTER TABLE pedido_producto
+    ADD    FOREIGN KEY (pedido_id)
+    REFERENCES pedido(id)
+;
+    
+ALTER TABLE pedido_producto
+    ADD    FOREIGN KEY (producto_id)
+    REFERENCES product(id)
+;
+    
+ALTER TABLE pedido
+    ADD    FOREIGN KEY (tienda_id)
+    REFERENCES tienda(id)
+;
+    
+ALTER TABLE pedido
+    ADD    FOREIGN KEY (empleado_id)
+    REFERENCES empleado(id)
+;
+    
+ALTER TABLE product
+    ADD    FOREIGN KEY (product_category_id)
+    REFERENCES product_category(id)
+;
+    
+ALTER TABLE pedido
+    ADD    FOREIGN KEY (client_id)
+    REFERENCES cliente(id)
+;
+    
+ALTER TABLE empleado
+    ADD    FOREIGN KEY (tienda_id)
+    REFERENCES tienda(id)
+;
+    
+
+# Create Indexes
+
+# seed data
+INSERT INTO cliente VALUES (1, 'Андрей' ,'Добровольский', NULL , '623108534', 'Barcelona', 'Barcelona' , 'Barcelona', '08026' );
+INSERT INTO product_category VALUES (1, 'большая пицца' );
+INSERT INTO product_category VALUES (2, 'имбирный чай' );
+INSERT INTO product VALUES (1, 1, 'Пицца со всяким разным', 'Пицца со всяким разным', 'https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg',100);
+INSERT INTO tienda VALUES (1, 'Barcelona' ,'Barcelona', 'Barcelona' , '08026');
+INSERT INTO empleado VALUES (1, 'Владимир' ,'Крапивин', NULL , '623108534', 'cocinero', 1 , '9940678Y');
+INSERT INTO pedido VALUES (1, 1, 'reparto', 1, '2023-12-12',100, 1 );
+INSERT INTO pedido_producto VALUES (1, 1 ,10);

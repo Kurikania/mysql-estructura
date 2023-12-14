@@ -1,0 +1,108 @@
+# Create schemas
+
+# Create tables
+USE optica;
+
+CREATE TABLE IF NOT EXISTS provedor
+(
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255),
+    telefon VARCHAR(9),
+    fax INT,
+    NIF VARCHAR(9) UNIQUE,
+    direccion VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS gafas
+(
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    montura_tipo ENUM('flotante', 'pasta', 'metalica'),
+    montura_color VARCHAR(50),
+    precio INT,
+    color_vidrio_d VARCHAR(50),
+    color_vidrio_i VARCHAR(50),
+    marca_id INT UNSIGNED NOT NULL,
+    graduacion_d DECIMAL(5,2),
+    graduacion_i DECIMAL(5,2)
+);
+
+CREATE TABLE IF NOT EXISTS client
+(
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255),
+    email VARCHAR(50),
+    direccion VARCHAR(255),
+    ref_client_id INT UNSIGNED,
+    registration_date DATE
+);
+
+CREATE TABLE IF NOT EXISTS venta
+(
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    create_date DATE,
+    client_id INT UNSIGNED NOT NULL,
+    empleado_id INT UNSIGNED NOT NULL,
+    gafas_id INT UNSIGNED NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS empleado
+(
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS marca
+(
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255),
+    proveerdor_id INT UNSIGNED
+);
+
+CREATE TABLE IF NOT EXISTS temporada_ventas
+(
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    fecha_inicio DATE,
+    fecha_fin DATE
+);
+
+# Create FKs
+
+ALTER TABLE gafas
+    ADD
+    FOREIGN KEY (marca_id)
+    REFERENCES marca(id)
+;
+    
+ALTER TABLE venta
+    ADD    FOREIGN KEY (client_id)
+    REFERENCES client(id)
+;
+    
+ALTER TABLE venta
+    ADD    FOREIGN KEY (gafas_id)
+    REFERENCES gafas(id)
+;
+    
+ALTER TABLE venta
+    ADD    FOREIGN KEY (empleado_id)
+    REFERENCES empleado(id)
+;
+    
+ALTER TABLE client
+    ADD    FOREIGN KEY (ref_client_id)
+    REFERENCES client(id)
+;
+    
+
+# Create Indexes
+
+
+# Seed data
+
+INSERT INTO provedor VALUES (1, 'Supergafas', 623108534, 623108534, '9940672Y', 'Barcelona');
+INSERT INTO provedor VALUES (2, 'Ultragafas', 623108534, 623108534, '9940672Y', 'Barcelona');
+INSERT INTO marca VALUES (1, 'Superglass', 1);
+INSERT INTO empleado VALUES (1);
+INSERT INTO gafas VALUES (1, 'flotante', 'negro', 50, 'transparente', 'transparente', 1, -1.10, -1.20);
+INSERT INTO client VALUES (1, 'Добровольский', 'dobro@mail.ru', 'Barcelona', NULL , '2018-03-28' );
+INSERT INTO venta VALUES (1, '2018-03-28', 1, 1, 1);
+INSERT INTO temporada_ventas VALUES (1, '2023-03-28', '2018-12-28');

@@ -1,0 +1,187 @@
+# Create schemas
+
+# Create tables
+CREATE TABLE IF NOT EXISTS user
+(
+    id INT NOT NULL UNIQUE,
+    password_hash VARCHAR(60),
+    username VARCHAR(50),
+    birth_date DATE,
+    gender ENUM('male', 'female', 'other'),
+    country VARCHAR(25),
+    postal_code VARCHAR(10),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS video
+(
+    id INT NOT NULL UNIQUE,
+    title VARCHAR(50),
+    description VARCHAR(255),
+    size DECIMAL(1, 1),
+    duration_seconds INT,
+    thumbnail VARCHAR(255),
+    state ENUM('public', 'hidden', 'private'),
+    filename VARCHAR(50),
+    views INT,
+    likes_number INT,
+    dislikes_number INT,
+    user_id INT,
+    created_at DATETIME,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS channel
+(
+    id INT NOT NULL UNIQUE,
+    user_id INT,
+    name VARCHAR(50),
+    description VARCHAR(255),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS like_video
+(
+    id INT NOT NULL UNIQUE,
+    value ENUM('like', 'dislike'),
+    video_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at DATETIME,
+    PRIMARY KEY(id),
+    CONSTRAINT UC_LIKE_VIDEO UNIQUE(user_id ,video_id)
+);
+
+CREATE TABLE IF NOT EXISTS playlist
+(
+    id INT NOT NULL UNIQUE,
+    name VARCHAR(50),
+    user_id INT,
+    visibility_state ENUM('public', 'private'),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS comment
+(
+    id INT NOT NULL UNIQUE,
+    video_id INT,
+    user_id INT,
+    created_at DATETIME,
+    comment_text VARCHAR(255),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS like_comment
+(
+    id INT NOT NULL UNIQUE,
+    comment_id INT,
+    value ENUM('like', 'dislike'),
+    user_id INT,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS label
+(
+    id INT NOT NULL UNIQUE,
+    name VARCHAR(50),
+    video_id INT,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS playlist_video
+(
+    video_id INT NOT NULL UNIQUE,
+    name VARCHAR(50),
+    playlist_id INT,
+    PRIMARY KEY(video_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_channel
+(
+    user_id INT NOT NULL,
+    channel_id INT,
+    PRIMARY KEY(user_id)
+);
+
+
+# Create FKs
+ALTER TABLE channel
+    ADD    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+;
+    
+ALTER TABLE like_video
+    ADD    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+;
+    
+ALTER TABLE like_video
+    ADD    FOREIGN KEY (video_id)
+    REFERENCES video(id)
+;
+    
+ALTER TABLE user_channel
+    ADD    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+;
+    
+ALTER TABLE user_channel
+    ADD    FOREIGN KEY (channel_id)
+    REFERENCES channel(id)
+;
+    
+ALTER TABLE playlist
+    ADD    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+;
+    
+ALTER TABLE playlist_video
+    ADD    FOREIGN KEY (video_id)
+    REFERENCES video(id)
+;
+    
+ALTER TABLE playlist_video
+    ADD    FOREIGN KEY (playlist_id)
+    REFERENCES playlist(id)
+;
+    
+ALTER TABLE comment
+    ADD    FOREIGN KEY (video_id)
+    REFERENCES video(id)
+;
+    
+ALTER TABLE comment
+    ADD    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+;
+    
+ALTER TABLE like_comment
+    ADD    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+;
+    
+ALTER TABLE like_comment
+    ADD    FOREIGN KEY (comment_id)
+    REFERENCES comment(id)
+;
+    
+ALTER TABLE label
+    ADD    FOREIGN KEY (video_id)
+    REFERENCES video(id)
+;
+    
+ALTER TABLE video
+    ADD    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+;
+    
+
+# Create Indexes
+
+# seed data
+
+INSERT INTO user VALUES (1, '$2y$10$p3bNRYJ7ktQ2/t3YOkXGX.sJa8uxdV4LU3NwK5bNXrGbv19TNWt9i', 'dobro', '1985-05-05', 'male' , 'Mongolia', '22011');
+INSERT INTO video VALUES (1, 'Cats playing', 'Cats playing', 20.5, 600 , 'path/to/file', 'public', 'catscatscats.mp4', 0,0,0, 1, '2023-10-03 14:58:52' );
+INSERT INTO channel VALUES (1, 1, 'Cats', 'Cats cats cats');
+INSERT INTO comment VALUES (1, 1, 1, '2023-10-03 14:58:52','what are lovely cats');
+
+-- SELECT video.id, video.title, comment.comment_text FROM video  JOIN comment ON video.id = comment.video_id ORDER BY video.id;
